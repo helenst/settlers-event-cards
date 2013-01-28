@@ -8,7 +8,7 @@ from kivy.app import App
 from kivy.uix.widget import Widget
 from kivy.graphics import Line, Ellipse
 from kivy.properties import NumericProperty
-
+from kivy.clock import Clock
 
 class DiceWidget(Widget):
     number = NumericProperty(0)
@@ -86,6 +86,7 @@ class DiceScreen(Widget):
     def __init__(self, **kwargs):
         super(DiceScreen, self).__init__(**kwargs)
         self.cards = []
+        self.rolling = False
 
     def renew_cards(self):
         self.cards = list(itertools.product(range(1, 7), range(1, 7)))
@@ -97,8 +98,23 @@ class DiceScreen(Widget):
         return self.cards.pop()
 
     def roll_dice(self):
-        self.dice1.number, self.dice2.number = self.next_card()
-        self.sum_label.text = str(self.dice1.number + self.dice2.number)
+
+        def animate_roll(*args):
+            self.dice1.number = random.randrange(1, 7)
+            self.dice2.number = random.randrange(1, 7)
+            self.rolling = True
+
+        def stop_rolling(*args):
+            Clock.unschedule(animate_roll)
+            self.rolling = False
+
+            self.dice1.number, self.dice2.number = self.next_card()
+            self.sum_label.text = str(self.dice1.number + self.dice2.number)
+
+        if not self.rolling:
+            # Roll the dice for a second
+            Clock.schedule_interval(animate_roll, 0.05)
+            Clock.schedule_once(stop_rolling, 1)
 
 
 class DiceApp(App):
