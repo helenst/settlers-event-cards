@@ -1,0 +1,3 @@
+title=Dice Replacement Service
+author=hel
+orientation=portrait
