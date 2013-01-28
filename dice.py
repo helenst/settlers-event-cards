@@ -9,7 +9,7 @@ from kivy.uix.button import Button
 from kivy.uix.label import Label
 from kivy.uix.boxlayout import BoxLayout
 from kivy.graphics import Line, Ellipse
-from kivy.properties import NumericProperty
+from kivy.properties import NumericProperty, ObjectProperty
 
 
 class DiceWidget(Widget):
@@ -17,12 +17,13 @@ class DiceWidget(Widget):
 
     def __init__(self, **kwargs):
         super(DiceWidget, self).__init__(**kwargs)
-        self.bind(size=self.redraw)
-        self.bind(pos=self.redraw)
+
+        self.bind(size=self.redraw, pos=self.redraw)
 
         # Components drawn on the canvas
         self.outline = None
         self.dots = []
+        self.number = 0
 
         self.redraw()
 
@@ -82,33 +83,18 @@ class DiceWidget(Widget):
                 size=(w, h)))
 
 
+class DiceScreen(Widget):
+
+    def roll_dice(self):
+        self.dice1.number = random.randrange(1, 7)
+        self.dice2.number = random.randrange(1, 7)
+        self.sum_label.text = str(self.dice1.number + self.dice2.number)
+
+
 class DiceApp(App):
     def build(self):
-        layout = BoxLayout(padding=10, orientation='vertical')
-        dice_layout = BoxLayout(padding=20, spacing=20, orientation='horizontal')
-        dice1 = DiceWidget()
-        dice2 = DiceWidget()
-        dice_layout.add_widget(dice1)
-        dice_layout.add_widget(dice2)
-        dice1.number = 0
-        dice2.number = 0
+        return DiceScreen()
 
-        layout.add_widget(dice_layout)
-
-        sum_label = Label(text="?", font_size='60sp')
-        layout.add_widget(sum_label)
-
-        roll = Button(text="Roll")
-
-        def on_roll(instance):
-            dice1.number = random.randrange(1, 7)
-            dice2.number = random.randrange(1, 7)
-            sum_label.text = str(dice1.number + dice2.number)
-
-        roll.bind(on_press=on_roll)
-        layout.add_widget(roll)
-
-        return layout
 
 if __name__ in ('__main__', '__android__'):
     DiceApp().run()
