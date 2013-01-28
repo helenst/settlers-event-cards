@@ -2,14 +2,12 @@ import kivy
 kivy.require('1.5.1')
 
 import random
+import itertools
 
 from kivy.app import App
 from kivy.uix.widget import Widget
-from kivy.uix.button import Button
-from kivy.uix.label import Label
-from kivy.uix.boxlayout import BoxLayout
 from kivy.graphics import Line, Ellipse
-from kivy.properties import NumericProperty, ObjectProperty
+from kivy.properties import NumericProperty
 
 
 class DiceWidget(Widget):
@@ -85,9 +83,21 @@ class DiceWidget(Widget):
 
 class DiceScreen(Widget):
 
+    def __init__(self, **kwargs):
+        super(DiceScreen, self).__init__(**kwargs)
+        self.cards = []
+
+    def renew_cards(self):
+        self.cards = list(itertools.product(range(1, 7), range(1, 7)))
+        random.shuffle(self.cards)
+
+    def next_card(self):
+        if not self.cards:
+            self.renew_cards()
+        return self.cards.pop()
+
     def roll_dice(self):
-        self.dice1.number = random.randrange(1, 7)
-        self.dice2.number = random.randrange(1, 7)
+        self.dice1.number, self.dice2.number = self.next_card()
         self.sum_label.text = str(self.dice1.number + self.dice2.number)
 
 
