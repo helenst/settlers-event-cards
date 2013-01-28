@@ -1,0 +1,32 @@
+<DiceScreen>:
+
+    dice1: dice1
+    dice2: dice2
+    sum_label: sum_label
+
+    BoxLayout:
+        size: root.size
+        pos: root.pos
+
+        orientation: 'vertical'
+        padding: 10
+
+        BoxLayout:
+            orientation: 'horizontal'
+            padding: 10
+            spacing: 20
+
+            DiceWidget:
+                id: dice1
+
+            DiceWidget:
+                id: dice2
+
+        Label:
+            text: '?'
+            font_size: '60sp'
+            id: sum_label
+
+        Button:
+            text: 'Roll'
+            on_press: root.roll_dice()
