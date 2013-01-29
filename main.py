@@ -3,6 +3,7 @@ kivy.require('1.5.1')
 
 import random
 import itertools
+from functools import partial
 
 from kivy.app import App
 from kivy.uix.widget import Widget
@@ -99,22 +100,20 @@ class DiceScreen(Widget):
 
     def roll_dice(self):
 
-        def animate_roll(*args):
-            self.dice1.number = random.randrange(1, 7)
-            self.dice2.number = random.randrange(1, 7)
-            self.rolling = True
-
-        def stop_rolling(*args):
-            Clock.unschedule(animate_roll)
-            self.rolling = False
-
-            self.dice1.number, self.dice2.number = self.next_card()
-            self.sum_label.text = str(self.dice1.number + self.dice2.number)
+        def animate_roll(n, *args):
+            if n > 0:
+                self.dice1.number = random.randrange(1, 7)
+                self.dice2.number = random.randrange(1, 7)
+                Clock.schedule_once(partial(animate_roll, n - 1), 0.05)
+            else:
+                self.dice1.number, self.dice2.number = self.next_card()
+                self.sum_label.text = str(self.dice1.number + self.dice2.number)
+                self.rolling = False
 
         if not self.rolling:
-            # Roll the dice for a second
-            Clock.schedule_interval(animate_roll, 0.05)
-            Clock.schedule_once(stop_rolling, 1)
+            self.rolling = True
+            self.sum_label.text = '?'
+            Clock.schedule_once(partial(animate_roll, 20), 0.05)
 
 
 class DiceApp(App):
