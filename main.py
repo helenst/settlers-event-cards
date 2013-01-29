@@ -116,12 +116,24 @@ class DiceScreen(Widget):
             self.rolling = True
             self.sum_label.text = '?'
             Clock.schedule_once(partial(animate_roll, 20), 0.05)
+
+            if self.roll_sound.state == 'play':
+                self.roll_sound.stop()
             self.roll_sound.play()
 
 
 class DiceApp(App):
     def build(self):
-        return DiceScreen()
+        screen = DiceScreen()
+
+        import shake
+        self.detector = shake.ShakeDetector()
+
+        def on_shake(how_hard):
+            screen.roll_dice()
+        self.detector.on_shake(on_shake)
+
+        return screen
 
 
 if __name__ in ('__main__', '__android__'):
