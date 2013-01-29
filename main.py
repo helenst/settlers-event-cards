@@ -11,6 +11,7 @@ from kivy.graphics import Line, Ellipse
 from kivy.properties import NumericProperty
 from kivy.clock import Clock
 
+
 class DiceWidget(Widget):
     number = NumericProperty(0)
 
