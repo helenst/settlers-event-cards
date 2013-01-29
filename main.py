@@ -10,7 +10,7 @@ from kivy.uix.widget import Widget
 from kivy.graphics import Line, Ellipse
 from kivy.properties import NumericProperty
 from kivy.clock import Clock
-
+from kivy.core.audio import SoundLoader
 
 class DiceWidget(Widget):
     number = NumericProperty(0)
@@ -88,6 +88,7 @@ class DiceScreen(Widget):
     def __init__(self, **kwargs):
         super(DiceScreen, self).__init__(**kwargs)
         self.cards = []
+        self.roll_sound = SoundLoader.load('diceroll.wav')
         self.rolling = False
 
     def renew_cards(self):
@@ -115,6 +116,7 @@ class DiceScreen(Widget):
             self.rolling = True
             self.sum_label.text = '?'
             Clock.schedule_once(partial(animate_roll, 20), 0.05)
+            self.roll_sound.play()
 
 
 class DiceApp(App):
