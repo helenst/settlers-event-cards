@@ -10,7 +10,7 @@ This is meant for use with the Settlers of Catan board game, which by default us
 
 (see http://boardgamegeek.com/boardgame/20038/catan-event-cards for more about the Event Cards)
 
-There is also a web-based version of the same thing on Game Pixies (http://gamepixies.com/settlers/) - written by @dgym
+There is also a web-based version of the same thing on Game Pixies (http://gamepixies.com/settlers/) - written by [dgym](https://github.com/dgym)
 
 
 Kivy
@@ -27,6 +27,7 @@ Features
 * Sound effects for dice roll
 * Accelerometer integration - roll on shake
 
-TODO
-----
-* Improve graphics - anti-aliasing and rounded corners would be nice
+
+Contributors
+------------
+* Thanks to [dgym](https://github.com/dgym) for making the circles more circular
