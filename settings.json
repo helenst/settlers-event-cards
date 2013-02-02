@@ -1,0 +1,18 @@
+[
+    {
+        "type": "bool",
+        "title": "Sound Effects",
+        "desc": "Play sound effects on dice roll",
+        "section": "sound",
+        "key": "effects",
+        "true": "auto"
+    },
+    {
+        "type": "bool",
+        "title": "Roll on shake",
+        "desc": "Roll the dice when the device is shaken",
+        "section": "accelerometer",
+        "key": "shake",
+        "true": "auto"
+    }
+]
