@@ -29,5 +29,4 @@ Features
 
 TODO
 ----
-* Settings screen (disable sound / accelerometer)
 * Improve graphics - anti-aliasing and rounded corners would be nice
