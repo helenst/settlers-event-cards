@@ -17,27 +17,24 @@ uniform sampler2D texture0;
 '''
 
 
-blur_shader = header + '''
-uniform vec2 resolution;
-uniform float time;
+circle_shader = header + '''
+uniform vec2 centre;
+uniform float radius;
+uniform float border;
 
 void main(void)
 {
-    vec2 coord = tex_coord0.st;
-    float blur_offset = 0.04;
-
-    vec4 colour = vec4(0.0, 0.0, 0.0, 0.0);
-    colour += texture2D(texture0, coord + vec2(-blur_offset, -blur_offset));
-    colour += texture2D(texture0, coord + vec2(-blur_offset, 0.0));
-    colour += texture2D(texture0, coord + vec2(-blur_offset, blur_offset));
-    colour += texture2D(texture0, coord + vec2(0.0, -blur_offset));
-    colour += texture2D(texture0, coord + vec2(0.0, 0.0));
-    colour += texture2D(texture0, coord + vec2(0.0, blur_offset));
-    colour += texture2D(texture0, coord + vec2(blur_offset, -blur_offset));
-    colour += texture2D(texture0, coord + vec2(blur_offset, 0.0));
-    colour += texture2D(texture0, coord + vec2(blur_offset, blur_offset));
-    colour /= 9.0;
-
+    vec4 colour = texture2D(texture0, tex_coord0);
+    vec2 delta = gl_FragCoord.xy - centre;
+    float dist = pow(delta.x*delta.x + delta.y*delta.y, 0.5);
+    if (dist > radius)
+    {
+        dist -= radius;
+        if (dist < border)
+            colour[3] *= cos(dist / border * 1.5707963267);
+        else
+            colour[3] = 0.0;
+    }
     gl_FragColor = colour;
 }
 '''
@@ -122,28 +119,28 @@ class DiceWidget(Widget):
                     group='dot')
 
     def render_dot(self, size):
-        # Render an antialiased dot using two frame buffer objects.
-        # An ellipse is rendered into the first using geometry.
-        # The first is then rendered into the second as a texture, using
-        # a blurring shader.
+        # Render an antialiased dot using the circle shader.
         with self.canvas:
-            geometry_fbo = Fbo(size=(512, 512))
-            blurred_fbo = Fbo(size=size)
+            dot_fbo = Fbo(size=size)
 
-        with geometry_fbo:
-            Ellipse(pos=(2, 2), size=(507, 507))
+        # Install the shader, and check it compiled.
+        original_fs = dot_fbo.shader.fs
+        dot_fbo.shader.fs = circle_shader
+        if not dot_fbo.shader.success:
+            # Shader didn't compile, just render an ellipse.
+            dot_fbo.shader.fs = original_fs
+            with dot_fbo:
+                Ellipse(pos=(2, 2), size=(size[0]-4, size[1]-4))
+        else:
+            # Render a rectangle with the circle shader.
+            border = 3.0
+            dot_fbo['centre'] = (size[0] * 0.5, size[1] * 0.5)
+            dot_fbo['radius'] = max(size[0] * 0.5 - border, 0.0)
+            dot_fbo['border'] = border
+            with dot_fbo:
+                Rectangle(size=size)
         
-        # Install the shader, but fallback to the default shader if it
-        # does not compile.
-        original_fs = blurred_fbo.shader.fs
-        blurred_fbo.shader.fs = blur_shader
-        if not blurred_fbo.shader.success:
-            blurred_fbo.shader.fs = original_fs
-
-        with blurred_fbo:
-            Rectangle(size=size, texture=geometry_fbo.texture)
-        
-        return blurred_fbo
+        return dot_fbo
 
     @property
     def bounding_box(self):
