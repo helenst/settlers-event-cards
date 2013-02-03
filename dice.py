@@ -61,7 +61,7 @@ class DiceWidget(Widget):
             Color(0.9, 0.1, 0.1)
             Rectangle(pos=(x, y), size=(w, h))
             Color(1, 1, 1)
-            Line(rectangle=(x, y, w, h), width=(w/200) + 1)
+            Line(rectangle=(x, y, w, h), width=(w / 200) + 1)
 
         # Update dots
         self.on_number()
