@@ -1,6 +1,6 @@
 from kivy.uix.widget import Widget
 from kivy.properties import NumericProperty
-from kivy.graphics import Ellipse, Line, Fbo, Rectangle
+from kivy.graphics import Ellipse, Line, Fbo, Rectangle, Color
 
 from shader import circle_shader
 
@@ -57,7 +57,10 @@ class DiceWidget(Widget):
 
         with self.canvas:
             # Draw the outline
-            Line(rectangle=(x, y, w, h))
+            Color(0.9, 0.1, 0.1)
+            Rectangle(pos=(x, y), size=(w, h))
+            Color(1, 1, 1)
+            Line(rectangle=(x, y, w, h), width=(w/200) + 1)
 
         # Update dots
         self.on_number()
@@ -95,7 +98,7 @@ class DiceWidget(Widget):
             # Shader didn't compile, just render an ellipse.
             dot_fbo.shader.fs = original_fs
             with dot_fbo:
-                Ellipse(pos=(2, 2), size=(size[0]-4, size[1]-4))
+                Ellipse(pos=(2, 2), size=(size[0] - 4, size[1] - 4))
         else:
             # Render a rectangle with the circle shader.
             border = 3.0
