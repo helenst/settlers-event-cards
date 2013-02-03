@@ -1,6 +1,7 @@
 from kivy.uix.widget import Widget
 from kivy.properties import NumericProperty
 from kivy.graphics import Ellipse, Line, Fbo, Rectangle, Color
+from kivy.graphics.gl_instructions import ClearColor, ClearBuffers
 
 from shader import circle_shader
 
@@ -90,6 +91,11 @@ class DiceWidget(Widget):
         # Render an antialiased dot using the circle shader.
         with self.canvas:
             dot_fbo = Fbo(size=size)
+
+        # Set the fbo to transparent
+        with dot_fbo:
+            ClearColor(0.9, 0.1, 0.1, 0.0)
+            ClearBuffers()
 
         # Install the shader, and check it compiled.
         original_fs = dot_fbo.shader.fs
