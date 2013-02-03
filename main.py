@@ -89,6 +89,10 @@ class DiceApp(App):
         elif name == ('accelerometer', 'shake'):
             self.shake_to_roll = (value == '1')
 
+    def on_pause(self):
+        # Allow switching away from app
+        return True
+
 
 if __name__ in ('__main__', '__android__'):
     DiceApp().run()
