@@ -1,7 +1,10 @@
 from kivy.uix.widget import Widget
 from kivy.properties import NumericProperty
-from kivy.graphics import Ellipse, Line, Fbo, Rectangle, Color
-from kivy.graphics.gl_instructions import ClearColor, ClearBuffers
+from kivy.graphics import Ellipse, Line, Fbo, Rectangle, Color, Callback
+from kivy.graphics.opengl import (
+    glBlendFunc,
+    GL_ONE, GL_ZERO, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA,
+)
 
 from shader import circle_vertex_shader, circle_fragment_shader
 
@@ -92,11 +95,6 @@ class DiceWidget(Widget):
         with self.canvas:
             dot_fbo = Fbo(size=size)
 
-        # Set the fbo to transparent
-        with dot_fbo:
-            ClearColor(0.9, 0.1, 0.1, 0.0)
-            ClearBuffers()
-
         # Install the shader, and check it compiled.
         original_vs = dot_fbo.shader.vs
         original_fs = dot_fbo.shader.fs
@@ -115,7 +113,9 @@ class DiceWidget(Widget):
             dot_fbo['radius'] = max(size[0] * 0.5 - border, 0.0)
             dot_fbo['border'] = border
             with dot_fbo:
+                Callback(lambda *_args: glBlendFunc(GL_ONE, GL_ZERO))
                 Rectangle(size=size)
+                Callback(lambda *_args: glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA))
 
         return dot_fbo
 
