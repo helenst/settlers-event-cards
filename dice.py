@@ -3,7 +3,7 @@ from kivy.properties import NumericProperty
 from kivy.graphics import Ellipse, Line, Fbo, Rectangle, Color
 from kivy.graphics.gl_instructions import ClearColor, ClearBuffers
 
-from shader import circle_shader
+from shader import circle_vertex_shader, circle_fragment_shader
 
 
 class DiceWidget(Widget):
@@ -98,10 +98,13 @@ class DiceWidget(Widget):
             ClearBuffers()
 
         # Install the shader, and check it compiled.
+        original_vs = dot_fbo.shader.vs
         original_fs = dot_fbo.shader.fs
-        dot_fbo.shader.fs = circle_shader
+        dot_fbo.shader.vs = circle_vertex_shader
+        dot_fbo.shader.fs = circle_fragment_shader
         if not dot_fbo.shader.success:
             # Shader didn't compile, just render an ellipse.
+            dot_fbo.shader.vs = original_vs
             dot_fbo.shader.fs = original_fs
             with dot_fbo:
                 Ellipse(pos=(2, 2), size=(size[0] - 4, size[1] - 4))
