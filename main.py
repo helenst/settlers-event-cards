@@ -57,8 +57,8 @@ class DiceScreen(Widget):
 
 class DiceApp(App):
     def build(self):
-        play_sounds = self.config.getint('sound', 'effects') == '1'
-        self.shake_to_roll = self.config.getint('accelerometer', 'shake') == '1'
+        play_sounds = self.config.getint('sound', 'effects') == 1
+        self.shake_to_roll = self.config.getint('accelerometer', 'shake') == 1
         self.screen = DiceScreen(play_sounds)
 
         import shake
