@@ -12,16 +12,31 @@ from kivy.uix.widget import Widget
 
 # Not used in here directly but import is needed for .kv file
 from dice import DiceWidget
+from shake import ShakeDetector
 
 
 class DiceScreen(Widget):
 
-    def __init__(self, play_sounds, **kwargs):
+    def __init__(self, **kwargs):
         super(DiceScreen, self).__init__(**kwargs)
         self.cards = []
-        self.roll_sound = SoundLoader.load('diceroll.wav')
         self.rolling = False
-        self.play_sounds = play_sounds
+        self.roll_sound = None
+        self.play_sounds = False
+        self.shake_to_roll = False
+
+        self.shake_detector = ShakeDetector(on_shake=self.roll_dice)
+        self.roll_sound = SoundLoader.load('diceroll.wav')
+
+    def configure(self, config):
+        self.play_sounds = config.getint('sound', 'effects') == 1
+        self.shake_to_roll = config.getint('accelerometer', 'shake') == 1
+
+        # Enable / disable the shake detector
+        if self.shake_to_roll:
+            self.shake_detector.enable()
+        else:
+            self.shake_detector.disable()
 
     def renew_cards(self):
         self.cards = list(itertools.product(range(1, 7), range(1, 7)))
@@ -57,17 +72,8 @@ class DiceScreen(Widget):
 
 class DiceApp(App):
     def build(self):
-        play_sounds = self.config.getint('sound', 'effects') == 1
-        self.shake_to_roll = self.config.getint('accelerometer', 'shake') == 1
-        self.screen = DiceScreen(play_sounds)
-
-        import shake
-        self.detector = shake.ShakeDetector()
-
-        def on_shake(how_hard):
-            if self.shake_to_roll:
-                self.screen.roll_dice()
-        self.detector.on_shake(on_shake)
+        self.screen = DiceScreen()
+        self.screen.configure(self.config)
 
         return self.screen
 
@@ -83,11 +89,7 @@ class DiceApp(App):
         settings.add_json_panel('Dice', self.config, 'settings.json')
 
     def on_config_change(self, config, section, key, value):
-        name = (section, key)
-        if name == ('sound', 'effects'):
-            self.screen.play_sounds = (value == '1')
-        elif name == ('accelerometer', 'shake'):
-            self.shake_to_roll = (value == '1')
+        self.screen.configure(config)
 
     def on_pause(self):
         # Allow switching away from app
