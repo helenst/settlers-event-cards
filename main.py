@@ -42,6 +42,13 @@ class DiceScreen(Widget):
         self.cards = list(itertools.product(range(1, 7), range(1, 7)))
         random.shuffle(self.cards)
 
+    def pause(self):
+        self.shake_detector.disable()
+
+    def resume(self):
+        if self.shake_to_roll:
+            self.shake_detector.enable()
+
     def next_card(self):
         if not self.cards:
             self.renew_cards()
@@ -92,8 +99,12 @@ class DiceApp(App):
         self.screen.configure(config)
 
     def on_pause(self):
+        self.screen.pause()
         # Allow switching away from app
         return True
+
+    def on_resume(self):
+        self.screen.resume()
 
 
 try:
