@@ -96,5 +96,17 @@ class DiceApp(App):
         return True
 
 
+try:
+    import jnius
+except ImportError:
+    jnius = None
+
+
+if jnius:
+    PythonActivity = jnius.autoclass('org.renpy.android.PythonActivity')
+    ActivityInfo = jnius.autoclass('android.content.pm.ActivityInfo')
+    activity = jnius.cast('android.app.Activity', PythonActivity.mActivity)
+    activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
+
 if __name__ in ('__main__', '__android__'):
     DiceApp().run()
